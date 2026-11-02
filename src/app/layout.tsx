@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree, Geist_Mono } from "next/font/google";
-import { Nav } from "@/components/Nav";
+import { BottomNav, Nav } from "@/components/Nav";
 import { SaveStatus } from "@/components/SaveStatus";
 import { SessionProvider } from "@/components/Session";
 import { THEME_SCRIPT } from "@/lib/theme";
@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   description: "Explainable, guideline-based screening nudges that a doctor reviews.",
 };
 
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // suppressHydrationWarning: THEME_SCRIPT sets data-theme before React hydrates, on purpose.
@@ -25,11 +27,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body suppressHydrationWarning className="flex min-h-full flex-col bg-page text-ink">
         <SessionProvider>
-          <header className="sticky top-0 z-20 border-b border-line bg-surface/90 backdrop-blur">
+          <header className="sticky top-0 z-20 border-b border-line bg-surface/90 pt-[env(safe-area-inset-top)] backdrop-blur">
             <Nav />
           </header>
           <SaveStatus />
           <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 pb-28 sm:py-10 md:pb-10">{children}</main>
+          <BottomNav />
         </SessionProvider>
         <footer className="border-t border-line bg-surface px-4 py-4 pb-24 text-center text-xs text-muted md:pb-4">
           CareNudge does not diagnose and never gives an all-clear. A rules engine decides what is flagged; AI only

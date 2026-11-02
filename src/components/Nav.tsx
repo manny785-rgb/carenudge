@@ -15,8 +15,8 @@ const NAV: { href: string; label: string; icon: IconName; roles: Role[] }[] = [
   { href: "/home", label: "Home", icon: "home", roles: ["patient"] },
   { href: "/intake", label: "My check", icon: "clipboard", roles: ["patient"] },
   { href: "/appointments", label: "Appointments", icon: "calendar", roles: ["patient"] },
-  { href: "/symptoms", label: "Symptoms", icon: "alert", roles: ["patient"] },
   { href: "/reports", label: "Reports", icon: "file", roles: ["patient"] },
+  { href: "/symptoms", label: "Symptoms", icon: "alert", roles: ["patient"] },
   { href: "/labelspeak", label: "Labels", icon: "tag", roles: ["patient"] },
   { href: "/choose-clinic", label: "Clinic", icon: "clinic", roles: ["patient"] },
   { href: "/privacy", label: "Data", icon: "lock", roles: ["patient"] },
@@ -59,33 +59,16 @@ export function Nav() {
   const router = useRouter();
   const { user, signOut } = useSession();
   const [menu, setMenu] = useState(false);
-  const [more, setMore] = useState(false);
   const links = NAV.filter((n) => user && n.roles.includes(user.role));
   const menuRef = useDismiss(menu, () => setMenu(false));
-  const moreRef = useDismiss(more, () => setMore(false));
 
   useEffect(() => {
     purgeExpiredFollowUps();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenu(false);
-    setMore(false);
   }, [pathname]);
 
   const active = (href: string) => pathname === href;
-  const tab = (n: (typeof NAV)[number]) => (
-    <Link
-      key={n.href}
-      href={n.href}
-      aria-current={active(n.href) ? "page" : undefined}
-      className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-xs font-semibold transition ${active(n.href) ? "text-accent-text" : "text-muted"}`}
-    >
-      <span className={`rounded-full px-4 py-1 transition ${active(n.href) ? "bg-accent-soft" : ""}`}>
-        <Icon name={n.icon} className="h-5 w-5" />
-      </span>
-      {n.label}
-    </Link>
-  );
-
   return (
     <>
       <nav className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-2" aria-label="Main">
@@ -94,7 +77,7 @@ export function Nav() {
           <span className="font-display text-xl font-bold tracking-tight text-ink">CareNudge</span>
         </Link>
 
-        {/* Desktop links: icon and label. Phones use the tab bar below instead. */}
+        {/* Desktop links: icon and label. Phones use the tab bar (BottomNav) instead. */}
         <div className="hidden items-center gap-1 md:flex">
           {links.map((n) => (
             <Link
@@ -158,9 +141,44 @@ export function Nav() {
         )}
       </nav>
 
-      {/* Phone tab bar: the first links, plus "More" for the rest. Fixed to the bottom, clear of the home indicator. */}
-      {user && links.length > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-20 md:hidden" ref={moreRef}>
+    </>
+  );
+}
+
+/**
+ * Phone tab bar: the first links, plus "More" for the rest. It must be rendered outside <header>: the header uses
+ * backdrop-blur, and a fixed element inside a blurred parent sticks to the parent instead of the bottom of the screen.
+ */
+export function BottomNav() {
+  const pathname = usePathname();
+  const { user } = useSession();
+  const [more, setMore] = useState(false);
+  const links = NAV.filter((n) => user && n.roles.includes(user.role));
+  const moreRef = useDismiss(more, () => setMore(false));
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMore(false);
+  }, [pathname]);
+
+  const active = (href: string) => pathname === href;
+  const tab = (n: (typeof NAV)[number]) => (
+    <Link
+      key={n.href}
+      href={n.href}
+      aria-current={active(n.href) ? "page" : undefined}
+      className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-xs font-semibold transition ${active(n.href) ? "text-accent-text" : "text-muted"}`}
+    >
+      <span className={`rounded-full px-4 py-1 transition ${active(n.href) ? "bg-accent-soft" : ""}`}>
+        <Icon name={n.icon} className="h-5 w-5" />
+      </span>
+      {n.label}
+    </Link>
+  );
+
+  if (!user || links.length === 0) return null;
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-20 md:hidden" ref={moreRef}>
           {more && (
             <div role="menu" className="mx-3 mb-2 grid grid-cols-2 gap-1 rounded-2xl border border-line bg-surface p-2" style={{ boxShadow: "var(--shadow-pop)" }}>
               {links.slice(BOTTOM_SLOTS).map((n) => (
@@ -179,8 +197,6 @@ export function Nav() {
               </button>
             )}
           </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }
