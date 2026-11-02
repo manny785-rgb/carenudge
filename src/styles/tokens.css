@@ -1,0 +1,135 @@
+/*
+ * Design tokens: the ONLY place colours are defined. Components use the Tailwind names below
+ * (bg-surface, text-muted, border-line, bg-accent...) and never a hex value, so both themes
+ * stay in step. The theme is set on <html data-theme="light|dark"> by the inline script in
+ * src/lib/theme.ts before first paint. Every text/background pair is checked for WCAG AA by
+ * `npm run check:contrast`.
+ */
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Surfaces and text: crisp white and cool pale grey, deep ink navy */
+  --page: #f4f6fa;
+  --surface: #ffffff;
+  --raised: #eef1f7;
+  --ink: #0f1b3d;
+  --muted: #4a5675;
+  --faint: #5d6a8c;
+  --line: #d9dfec;
+  --line-strong: #bfc8dd;
+
+  /* One vivid accent, plus a small playful secondary (coral) for highlights, badges and progress */
+  --accent: #3d5afe;
+  --accent-strong: #2a44d6;
+  --accent-ink: #ffffff; /* text on an accent fill */
+  --accent-soft: #e6eaff;
+  --accent-text: #2a44d6; /* links and accent text on light surfaces */
+  --play: #ff6b5a;
+  --play-ink: #0f1b3d;
+  --play-soft: #ffe9e5;
+
+  /* Status: each has a fill, a text colour that passes AA on that fill, and a border */
+  --ok: #17693f;
+  --ok-soft: #e1f4ea;
+  --warn: #8a4b00;
+  --warn-soft: #fff1dc;
+  --warn-line: #f2d3a6;
+  --bad: #b42318;
+  --bad-soft: #fde9e7;
+  --bad-line: #f5c2bd;
+  --info: #1b5e9b;
+  --info-soft: #e4f0fb;
+
+  /* Urgent-symptom banner and "Not a diagnosis": always high contrast, never the accent */
+  --urgent-bg: #fde8e6;
+  --urgent-ink: #7a1b12;
+  --urgent-line: #e7948b;
+
+  /* Elevation: soft layered shadows in light mode */
+  --shadow-card: 0 1px 2px rgba(15, 27, 61, 0.06), 0 8px 24px -8px rgba(15, 27, 61, 0.14);
+  --shadow-pop: 0 2px 4px rgba(15, 27, 61, 0.08), 0 16px 40px -12px rgba(15, 27, 61, 0.22);
+  --focus: #3d5afe;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Deep navy-charcoal (not black), soft off-white text, slightly desaturated accents */
+  --page: #0e1426;
+  --surface: #161d33;
+  --raised: #1f2844;
+  --ink: #e8ecf8;
+  --muted: #a8b3d1;
+  --faint: #8e9ab8;
+  --line: #2d3757;
+  --line-strong: #3d4a70;
+
+  --accent: #93a5ff;
+  --accent-strong: #b0bdff;
+  --accent-ink: #0e1426;
+  --accent-soft: #232c54;
+  --accent-text: #a9b8ff;
+  --play: #ff8f80;
+  --play-ink: #0e1426;
+  --play-soft: #3b2230;
+
+  --ok: #5ed39a;
+  --ok-soft: #17332b;
+  --warn: #f2b25c;
+  --warn-soft: #3a2c16;
+  --warn-line: #5a4320;
+  --bad: #ff8a80;
+  --bad-soft: #3a1c22;
+  --bad-line: #6a2b33;
+  --info: #8cc2f5;
+  --info-soft: #172b44;
+
+  --urgent-bg: #3f1a1d;
+  --urgent-ink: #ffd6d1;
+  --urgent-line: #a8453f;
+
+  /* Dark mode uses subtle borders and lighter surfaces for elevation instead of heavy shadows */
+  --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.03), 0 6px 18px -8px rgba(0, 0, 0, 0.5);
+  --shadow-pop: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 40px -12px rgba(0, 0, 0, 0.65);
+  --focus: #93a5ff;
+}
+
+/* Tailwind v4: expose the tokens as utilities (bg-surface, text-ink, border-line, ...) */
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-play: var(--play);
+  --color-play-ink: var(--play-ink);
+  --color-play-soft: var(--play-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-line: var(--warn-line);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-bad-line: var(--bad-line);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-urgent-bg: var(--urgent-bg);
+  --color-urgent-ink: var(--urgent-ink);
+  --color-urgent-line: var(--urgent-line);
+
+  --font-sans: var(--font-figtree);
+  --font-display: var(--font-bricolage);
+  --font-mono: var(--font-geist-mono);
+
+}

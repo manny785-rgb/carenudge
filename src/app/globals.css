@@ -1,26 +1,139 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base: colours come from tokens only. Body text is 18px; headings use the display font. */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-figtree), system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+}
+h1, h2, h3 {
+  font-family: var(--font-bricolage), var(--font-figtree), system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Visible focus for keyboard users, in both themes. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+/* Checkboxes and radios pick up the accent and are big enough to tap. */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--accent);
+  width: 1.25rem;
+  height: 1.25rem;
+}
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+@layer components {
+  /* Cards: rounded and friendly. Soft layered shadow in light mode, subtle border in dark. */
+  .card {
+    @apply rounded-[20px] border border-line bg-surface p-5 transition;
+    box-shadow: var(--shadow-card);
+    animation: rise 0.4s ease-out both;
+  }
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-semibold transition duration-150 select-none disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-accent text-accent-ink shadow-sm hover:-translate-y-px hover:bg-accent-strong hover:shadow-md active:translate-y-0 active:scale-[0.97];
+  }
+  .btn-secondary {
+    @apply border border-line-strong bg-surface text-ink hover:bg-raised active:scale-[0.97];
+  }
+  .btn-danger {
+    @apply border border-bad-line bg-surface text-bad hover:bg-bad-soft active:scale-[0.97];
+  }
+  .input {
+    @apply min-h-12 w-full rounded-xl border border-line-strong bg-surface px-4 py-3 text-base text-ink placeholder:text-faint transition focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none;
+  }
+  .label {
+    @apply mb-2 block text-base font-semibold text-ink;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold;
+  }
+  /* Status tints: a soft fill with text that passes AA on it, in both themes. */
+  .tone-ok { @apply bg-ok-soft text-ok; }
+  .tone-warn { @apply bg-warn-soft text-warn; }
+  .tone-bad { @apply bg-bad-soft text-bad; }
+  .tone-info { @apply bg-info-soft text-info; }
+  .tone-accent { @apply bg-accent-soft text-accent-text; }
+  .tone-play { @apply bg-play text-play-ink; }
+  .tone-quiet { @apply bg-raised text-muted; }
+  /* The urgent-symptom banner and "Not a diagnosis" label: fixed high contrast, never recoloured. */
+  .urgent { @apply rounded-xl border border-urgent-line bg-urgent-bg p-3 font-semibold text-urgent-ink; }
+  .not-diagnosis { @apply inline-flex items-center gap-1 rounded-full border border-urgent-line bg-urgent-bg px-3 py-1 text-sm font-bold text-urgent-ink; }
+}
+
+/* Small delights. All of them stop for people who prefer reduced motion (see the end of this file). */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent); }
+  50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+.pulse-soft { animation: pulse-soft 2.4s ease-in-out infinite; }
+.tick-draw path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: draw 0.45s ease-out 0.1s forwards; }
+.wave-bar { transform-origin: center; animation: wave 0.9s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .tick-draw path { stroke-dashoffset: 0; }
+}
+
+/* Printable pages (e.g. the pre-visit brief): always light, no navigation or controls. */
+@media print {
+  header,
+  footer,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+  :root,
+  :root[data-theme="light"],
+  :root[data-theme="dark"] {
+    --page: #ffffff;
+    --surface: #ffffff;
+    --ink: #000000;
+    --muted: #333333;
+    --line: #cccccc;
+  }
+  body {
+    background: white !important;
+    font-size: 12pt;
+  }
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    break-inside: avoid;
+    animation: none;
+  }
 }

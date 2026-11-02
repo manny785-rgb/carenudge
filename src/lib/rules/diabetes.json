@@ -1,0 +1,84 @@
+{
+  "pathway": "diabetes",
+  "version": "0.1.0",
+  "note": "Deterministic rules. The LLM never decides what is flagged. Verify every source quote against the live page before a public demo.",
+  "rules": [
+    {
+      "id": "DM-SYMPTOMS",
+      "priority": "see_doctor_soon",
+      "when": { "symptomsAny": ["very thirsty", "frequent urination", "unexplained weight loss", "blurred vision", "slow-healing wounds", "constant tiredness"] },
+      "title": "See a doctor about your symptoms — don't wait for routine screening",
+      "reason": "You reported {symptoms}. These can have many causes, including high blood sugar. Only a doctor can check what is going on.",
+      "action": "Book a GP visit in the next few days and mention these symptoms.",
+      "whyShort": "I reported symptoms that a doctor should check",
+      "actionShort": "See a GP in the next few days",
+      "source": {
+        "name": "HealthHub (MOH Singapore) — Diabetes",
+        "url": "https://www.healthhub.sg/a-z/diseases-and-conditions/diabetes",
+        "quote": "Common symptoms of diabetes include excessive thirst, frequent urination, unexplained weight loss and blurred vision; see a doctor if you have them."
+      }
+    },
+    {
+      "id": "DM-AGE40",
+      "priority": "due",
+      "when": { "ageMin": 40, "lastTestIn": ["over_3y", "never", "unknown"] },
+      "title": "You're due for a diabetes screening",
+      "reason": "You are {age}, and your last blood sugar test was {lastTest}. Screening is recommended every 3 years from age 40.",
+      "action": "Book a diabetes screening (blood test) at a Healthier SG / Screen for Life clinic.",
+      "whyShort": "I'm 40+ and haven't been screened in the last 3 years",
+      "actionShort": "Book a diabetes screening blood test",
+      "source": {
+        "name": "Health Promotion Board — Screen for Life",
+        "url": "https://www.healthhub.sg/programmes/screen-for-life",
+        "quote": "Diabetes screening is recommended once every 3 years for Singaporeans aged 40 and above."
+      }
+    },
+    {
+      "id": "DM-FDR-YOUNG",
+      "priority": "ask_doctor",
+      "when": { "ageMin": 18, "ageMax": 39, "firstDegreeRelativeWith": "diabetes", "lastTestIn": ["over_3y", "never", "unknown"] },
+      "title": "Ask a doctor whether you should be screened earlier",
+      "reason": "Your {relativeList} has diabetes. A parent, brother or sister with diabetes is a known risk factor, so screening may be advised before 40.",
+      "action": "Do the Diabetes Risk Assessment and ask a GP if you should be screened now.",
+      "whyShort": "A close blood relative has diabetes",
+      "actionShort": "Ask a GP about screening before 40",
+      "source": {
+        "name": "Health Promotion Board — Screen for Life (adults 18–39)",
+        "url": "https://www.healthhub.sg/programmes/screen-for-life",
+        "quote": "Singaporeans aged 18 to 39 are encouraged to complete the Diabetes Risk Assessment; those found at risk are advised to go for screening."
+      }
+    },
+    {
+      "id": "DM-BMI-YOUNG",
+      "priority": "ask_doctor",
+      "when": { "ageMin": 18, "ageMax": 39, "bmiMin": 23, "lastTestIn": ["over_3y", "never", "unknown"] },
+      "title": "Your weight-to-height ratio is a risk factor worth discussing",
+      "reason": "Your BMI works out to about {bmi}. For Asian adults, a BMI of 23 or more is linked to higher diabetes risk.",
+      "action": "Do the Diabetes Risk Assessment and ask a GP if you should be screened.",
+      "whyShort": "My BMI is 23 or above",
+      "actionShort": "Ask a GP about screening before 40",
+      "source": {
+        "name": "HealthHub (MOH Singapore) — BMI for Asians",
+        "url": "https://www.healthhub.sg/live-healthy/bmi-calculator",
+        "quote": "For Asians, a BMI of 23 and above indicates increased health risk."
+      }
+    },
+    {
+      "id": "DM-GDM",
+      "priority": "due",
+      "when": { "gestationalDiabetes": true, "lastTestIn": ["over_3y", "never", "unknown"] },
+      "title": "Past gestational diabetes means regular screening",
+      "reason": "You told us you had diabetes during a pregnancy. That raises the chance of type 2 diabetes later, even years after.",
+      "action": "Book a diabetes screening blood test, and repeat at least every 3 years.",
+      "whyShort": "I had diabetes during a pregnancy",
+      "actionShort": "Book a diabetes screening blood test",
+      "source": {
+        "name": "American Diabetes Association — Standards of Care, Section 2",
+        "url": "https://diabetesjournals.org/care/issue/48/Supplement_1",
+        "quote": "People with a history of gestational diabetes should have lifelong testing for prediabetes and/or diabetes at least every 3 years."
+      }
+    }
+  ],
+  "treatedNotice": "You told us you already take diabetes medicine. Screening nudges don't apply — keep following the plan from your doctor.",
+  "noNudgeNotice": "None of the diabetes rules we check matched what you told us today. This is NOT an all-clear: it only covers diabetes screening timing, and things can change. Keep up regular check-ups, and see a doctor if you feel unwell."
+}
