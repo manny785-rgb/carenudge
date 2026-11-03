@@ -48,3 +48,6 @@ next-env.d.ts
 # local-only files: a scratch file holding the database token, and a demo-data backup
 /impo.txt
 /backups/
+
+.vercel
+.env*
