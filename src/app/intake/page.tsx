@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { NudgeCard } from "@/components/NudgeCard";
 import { ShareConsent } from "@/components/ShareConsent";
 import { useSession } from "@/components/Session";
@@ -55,20 +56,24 @@ const DIABETES_MEDS = /metformin|insulin|gliclazide|sitagliptin|empagliflozin|da
 
 export default function IntakePage() {
   // Needs localStorage and the URL, so render only on the client.
-  return useHydrated() ? <Intake /> : null;
+  return useHydrated() ? (
+    <Suspense fallback={null}>
+      <IntakeForUrl />
+    </Suspense>
+  ) : null;
 }
 
-function Intake() {
-  // Resume a saved case via ?case=<id>
-  // Resume a saved case via ?case=<id>; with no id, reopen the latest saved check so nothing is typed in twice.
-  // ?new=1 starts a blank one on purpose.
-  const [resumed] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("case");
-    if (id) return getCase(id);
-    if (params.get("new")) return null;
-    return load().cases[0] ?? null;
-  });
+/** Remounts the check whenever the URL changes. Next keeps a visited page's state alive, so without the key a link
+ *  like "See why" (?case=...) could land on a stale blank check from an earlier visit and ask for the history again. */
+function IntakeForUrl() {
+  const params = useSearchParams();
+  return <Intake key={params.toString()} caseId={params.get("case")} fresh={!!params.get("new")} />;
+}
+
+function Intake({ caseId, fresh }: { caseId: string | null; fresh: boolean }) {
+  // Resume a saved case via ?case=<id>. With no id (or one that is gone), reopen the latest saved check so nothing is
+  // typed in twice. ?new=1 starts a blank one on purpose.
+  const [resumed] = useState(() => (fresh ? null : (caseId ? getCase(caseId) : null) ?? load().cases[0] ?? null));
   const [step, setStep] = useState<Step>(resumed ? (resumed.rules ? "nudges" : "confirm") : "consent");
   const [c, setC] = useState<CareCase>(() => resumed ?? newCase());
   const [busy, setBusy] = useState(false);
