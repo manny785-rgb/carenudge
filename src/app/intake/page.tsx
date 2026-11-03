@@ -12,7 +12,7 @@ import { ClinicUpdates } from "@/components/ClinicUpdates";
 import { PERSONAS } from "@/lib/personas";
 import { SYMPTOM_OPTIONS, bmiOf, evaluate, lastTestLabel, teachBackOptions } from "@/lib/rules/engine";
 import { LANGUAGES } from "@/lib/speech";
-import { emptyFindings, getCase, newId, recordTeachBack, saveNow, upsertCase, useHydrated } from "@/lib/storage";
+import { emptyFindings, getCase, load, newId, recordTeachBack, saveNow, upsertCase, useHydrated } from "@/lib/storage";
 import type { CareCase, HealthSummary, LastTest, Medication, Relative } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
 import { Stepper } from "@/components/ui/Stepper";
@@ -60,9 +60,14 @@ export default function IntakePage() {
 
 function Intake() {
   // Resume a saved case via ?case=<id>
+  // Resume a saved case via ?case=<id>; with no id, reopen the latest saved check so nothing is typed in twice.
+  // ?new=1 starts a blank one on purpose.
   const [resumed] = useState(() => {
-    const id = new URLSearchParams(window.location.search).get("case");
-    return id ? getCase(id) : null;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("case");
+    if (id) return getCase(id);
+    if (params.get("new")) return null;
+    return load().cases[0] ?? null;
   });
   const [step, setStep] = useState<Step>(resumed ? (resumed.rules ? "nudges" : "confirm") : "consent");
   const [c, setC] = useState<CareCase>(() => resumed ?? newCase());
@@ -82,7 +87,7 @@ function Intake() {
     setC(newCase());
     setStep("consent");
     setError("");
-    window.history.replaceState(null, "", "/intake");
+    window.history.replaceState(null, "", "/intake?new=1");
     window.scrollTo({ top: 0 });
   };
 

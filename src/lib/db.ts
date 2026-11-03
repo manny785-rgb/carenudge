@@ -331,7 +331,11 @@ export async function seed(): Promise<Db> {
     sh.updatedAt = sh.sharedAt;
     if (sh.id !== "s-seed-3") sh.viewedBy = Object.fromEntries((staffOf[sh.clinicId] ?? []).map((id) => [id, new Date().toISOString()]));
   }
-  await resetDb(db, db.shares.map(caseFromShare));
+  // Siti has no clinic yet (so no share), but she still starts with a saved, confirmed check like the others.
+  const siti = patients.find((p) => p.id === "u-siti")!;
+  const sitiSummary = { ...personaSummary("siti"), gestationalDiabetes: true as const };
+  const sitiCase = { ...shareBase(siti, "", "seed-siti-share", "seed-siti", sitiSummary).snapshot, rules: evaluate(sitiSummary) };
+  await resetDb(db, [...db.shares.map(caseFromShare), { patientId: siti.id, case: sitiCase }]);
   return db;
 }
 
