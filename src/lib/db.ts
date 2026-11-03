@@ -315,7 +315,8 @@ export async function seed(): Promise<Db> {
   const db: Db = {
     secret: existing?.secret ?? randomBytes(32).toString("hex"),
     users: [...patients, ...staff, ...bg.users],
-    clinics: ACTIVE_CLINICS.map((c) => ({ ...c, demo: true })),
+    // The demo clinics start on Pro so every feature works; downgrade on the Subscription page to see the paywall.
+    clinics: ACTIVE_CLINICS.map((c) => ({ ...c, demo: true, plan: "pro" as const, planSince: new Date().toISOString() })),
     shares: [share, seedDaniel(daniel), seedArjun(patients.find((p) => p.id === "u-arjun")!), ...bg.shares],
     teachBack: [
       { patientId: meiLing.id, ruleId: tbRule, whyCorrect: true, actionCorrect: true, at: daysAgo(20) },

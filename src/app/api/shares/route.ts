@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { deriveSnapshot, expiryFor, isActive, newId, readDb, writeDb, type Share } from "@/lib/db";
 import { getCaseRow } from "@/lib/dbstore";
+import { FREE_SHARE_LIMIT, planOf, sharedThisMonth } from "@/lib/plans";
 import { requireUser } from "@/lib/session";
+import { sgToday } from "@/lib/sgtime";
 
 // Patient-side sharing. Every handler is scoped to the signed-in patient. A share is the clinic's
 // copy of one of the patient's saved checks (see /api/cases, which keeps it up to date).
@@ -56,6 +58,15 @@ export async function POST(req: Request) {
   const db = await readDb();
   const clinic = db.clinics.find((x) => x.id === auth.clinicId);
   if (!clinic) return Response.json({ error: "Choose a clinic first." }, { status: 400 });
+
+  // A Free clinic takes a limited number of new patients a month. A patient already counted can re-share.
+  if (planOf(clinic) === "free") {
+    const month = sgToday().slice(0, 7);
+    const counted = sharedThisMonth(db.shares, clinic.id, month);
+    if (!counted.has(auth.id) && counted.size >= FREE_SHARE_LIMIT) {
+      return Response.json({ error: `${clinic.name} can't accept new shared summaries this month. Please contact the clinic directly.` }, { status: 403 });
+    }
+  }
 
   const booked = c.followUps.find((f) => f.createdBy === "patient" && f.status === "booked" && f.dueDate === appointmentDate && f.where === clinic.name);
   if (!booked) return Response.json({ error: `Book an appointment with ${clinic.name} before sharing.` }, { status: 400 });

@@ -19,6 +19,9 @@ export interface Clinic {
   demo?: boolean;
   /** Only active clinics are seeded. Set to false (or omit from the seed) to hide a clinic; flip back to restore it. Default: active. */
   active?: boolean;
+  /** Subscription plan (demo, no payment). Missing means free. Only the clinic's own ops staff change it. */
+  plan?: "free" | "pro";
+  planSince?: string;
 }
 
 const WEEKDAY: [string, string][] = [["09:00", "21:00"]];

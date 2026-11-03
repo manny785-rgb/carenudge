@@ -1,5 +1,6 @@
 import { readDb, sharesForOps } from "@/lib/db";
 import { bucketOf } from "@/lib/followups";
+import { planOf } from "@/lib/plans";
 import { requireStaff } from "@/lib/session";
 import { sgToday } from "@/lib/sgtime";
 
@@ -11,6 +12,9 @@ export async function GET() {
   if (auth instanceof Response) return auth;
 
   const db = await readDb();
+  // The dashboard is a Pro feature (enforced here, not just hidden in the page).
+  const clinic = db.clinics.find((c) => c.id === auth.clinicId);
+  if (!clinic || planOf(clinic) !== "pro") return Response.json({ error: "The dashboard is part of the Pro plan.", upgrade: true }, { status: 402 });
   // Aggregates only: counts and averages, never per-patient clinical data.
   const all = sharesForOps(db, auth);
   const shares = all.filter((s) => s.appointmentStatus !== "cancelled");

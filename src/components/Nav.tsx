@@ -32,6 +32,7 @@ const NAV: { href: string; label: string; icon: IconName; roles: Role[] }[] = [
   { href: "/clinic/dashboard", label: "Dashboard", icon: "chart", roles: ["clinic_ops"] },
   { href: "/clinic/profile", label: "Clinic profile", icon: "clinic", roles: ["clinic_ops"] },
   { href: "/clinic/audit", label: "Access log", icon: "list", roles: ["clinic_ops"] },
+  { href: "/clinic/subscription", label: "Plan", icon: "card", roles: ["clinic_ops"] },
   { href: "/clinic/listing", label: "Listing", icon: "pin", roles: ["clinic_ops"] },
 ];
 

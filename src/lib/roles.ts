@@ -27,7 +27,7 @@ const RULES: [string, Role[]][] = [
   // APIs
   ["/api/shares", PATIENT], ["/api/cases", PATIENT], ["/api/teachback", PATIENT], ["/api/profile", PATIENT],
   ["/api/doctor-home", DOCTOR], ["/api/ops-home", OPS], ["/api/requests", DOCTOR], ["/api/results", DOCTOR], ["/api/extract-results", DOCTOR],
-  ["/api/dashboard", OPS], ["/api/clinic-profile", OPS],
+  ["/api/dashboard", OPS], ["/api/clinic-profile", OPS], ["/api/subscription", OPS],
   ["/api/appointments", ["doctor", "clinic_ops"]], ["/api/followups", ["doctor", "clinic_ops"]], ["/api/audit", ["patient", "clinic_ops"]],
 ];
 

@@ -117,6 +117,7 @@ export default function ClinicHomePage() {
             <Link href="/clinic" className="btn-secondary">Appointments</Link>
             <Link href="/clinic/followups" className="btn-secondary">Follow-ups</Link>
             <Link href="/clinic/dashboard" className="btn-secondary">Dashboard</Link>
+            <Link href="/clinic/subscription" className="btn-secondary">Plan</Link>
           </div>
         </>
       )}

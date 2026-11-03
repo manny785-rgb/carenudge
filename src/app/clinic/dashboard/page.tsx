@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback } from "react";
+import { Icon } from "@/components/ui/Icon";
 import { LiveStamp } from "@/components/LiveStamp";
 import { useLive } from "@/lib/useLive";
 
@@ -32,12 +34,23 @@ export default function DashboardPage() {
   // Fresh every 12 seconds and when the tab is shown. A failed read keeps the numbers on screen.
   const fetchDash = useCallback(async () => {
     const res = await fetch("/api/dashboard", { cache: "no-store" });
+    if (res.status === 402) return { locked: true } as const; // Free plan
     if (!res.ok) throw new Error(String(res.status));
     return (await res.json()) as Dash;
   }, []);
   const { data: d, at } = useLive(fetchDash);
 
   if (!d) return <p className="text-faint">Loading…</p>;
+  if ("locked" in d) {
+    return (
+      <div className="card mx-auto max-w-xl space-y-3 text-center">
+        <Icon name="lock" className="mx-auto h-8 w-8 text-accent-text" />
+        <h1 className="font-display text-2xl font-bold">The dashboard is a Pro feature</h1>
+        <p className="text-sm text-muted">Upgrade your clinic to Pro to see follow-up, no-show and teach-back numbers. Everything else keeps working on Free.</p>
+        <Link href="/clinic/subscription" className="btn-primary">See plans</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
